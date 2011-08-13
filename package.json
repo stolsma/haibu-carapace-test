@@ -1,0 +1,21 @@
+{
+	"name": "haibu-carapace-test",
+	"description": "Testing simultanious spawning of multiple haibu-carapaces to prove issue #6 on https://github.com/nodejitsu/haibu-carapace",
+	"version": "0.0.1",
+	"author": "Tolsma Telematica Consultancy <code at tolsma.net>, Sander Tolsma <sander at tolsma.net>",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/stolsma/haibu-carapace-test"
+	},
+	"keywords": ["distributed", "cloud computing", "automated deployment", "platform-as-a-service"],
+	"dependencies": {
+		"haibu-carapace": "0.2.x >=0.2.4",
+		"hook.io": "0.6.x >=0.6.0"
+	},
+	"main": "./test",
+	"bin": {
+	},
+	"engines": {
+		"node": "0.4.x"
+	}
+}
