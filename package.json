@@ -10,7 +10,8 @@
 	"keywords": ["distributed", "cloud computing", "automated deployment", "platform-as-a-service"],
 	"dependencies": {
 		"haibu-carapace": "0.2.x >=0.2.4",
-		"hook.io": "0.6.x >=0.6.0"
+		"hook.io": "0.6.x >=0.6.0",
+		"optimist": "0.2.x"
 	},
 	"main": "./test",
 	"bin": {

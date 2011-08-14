@@ -8,10 +8,15 @@
 var path = require('path'),
 	spawn = require('child_process').spawn,
 	inspect = require('util').inspect,
-	Hook = require('hook.io').Hook;
+	Hook = require('hook.io').Hook,
+	argv = require('optimist').argv;
 
-//Start the test with the number of servers to create
-doTest(20, 6000, false);
+var debug = (argv.debug) ? true : false,
+	procs = (argv.procs) ? argv.procs : 20,
+	basePort = (argv.base) ? argv.base : 6000;
+
+//Start the test with the given arguments
+doTest(procs, basePort, debug);
 
 /**
  * Start the requested number of hook.io servers and testservers
