@@ -50,11 +50,15 @@ function doTest(number, basePort, debug) {
 	console.log('All ' + number + ' servers are spawned... Wait for the Test End msg (approx. 30 sec from now) to show up!!');
 	
 	var t = setTimeout(function() {
-		if (errStat.number==0) 
-			console.log('All tests are done. If there are no Error Messages then everything went ok!!');
-		else
+		if (errStat.number==0) { 
+			console.log('All tests are done. If there are no aditional Error Messages then everything went ok!!');
+			process.exit(0);
+		} else {
 			console.log('All tests are done. ' + errStat.number + ' servers died!!! ', errStat.list);
+			process.exit(1);
+		}
 	},30000);
+		
 }
 
 /**
