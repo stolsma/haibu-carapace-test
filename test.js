@@ -12,7 +12,7 @@ var path = require('path'),
 	argv = require('optimist').argv;
 
 var debug = (argv.debug) ? true : false,
-	procs = (argv.procs) ? argv.procs : 20,
+	procs = (argv.procs) ? argv.procs : 10,
 	basePort = (argv.base) ? argv.base : 6000;
 
 //Start the test with the given arguments
@@ -25,14 +25,27 @@ doTest(procs, basePort, debug);
  * @param debug {Boolean} True if debug msg need to be put on console...
  */
 function doTest(number, basePort, debug) {
-	var errStat = {
-		number: 0,
-		list: []
-	};
+	var procs = 0, 
+		errStat = {
+		  number: 0,
+		  list: []
+		};
 	
 	function error(id) {
 		errStat.number++;
 		errStat.list.push(id);
+	};
+	
+	function ready() {
+		if (--procs == 0) {
+			if (errStat.number==0) { 
+				console.log('All tests are done. If there are no aditional Error Messages then everything went ok!!');
+				process.exit(0);
+			} else {
+				console.log('All tests are done. ' + errStat.number + ' servers died!!! ', errStat.list);
+				process.exit(1);
+			}
+		}
 	};
 	
 	console.log('Starting ' + number + ' test servers...  Wait for the Test End msg!!');
@@ -41,24 +54,14 @@ function doTest(number, basePort, debug) {
 		var server = 'Server-' + i,
 			port = basePort++;
 		
-		if (debug) console.log('spawning server: ' + server + '  at port: ' + port);
+		if (debug) console.log('spawning server: ' + server + ' using hook.io port: ' + port);
 		
 		// start a hook.io server for each server to prevent the ECONNRESET error: thats a bug in hook.io!!! 
 		initHook(server, port, debug); 
-		spawnServer(server, port, error, debug);
+		spawnServer(server, port, ready, error, debug);
+		procs++;
 	}
-	console.log('All ' + number + ' servers are spawned... Wait for the Test End msg (approx. 30 sec from now) to show up!!');
-	
-	var t = setTimeout(function() {
-		if (errStat.number==0) { 
-			console.log('All tests are done. If there are no aditional Error Messages then everything went ok!!');
-			process.exit(0);
-		} else {
-			console.log('All tests are done. ' + errStat.number + ' servers died!!! ', errStat.list);
-			process.exit(1);
-		}
-	},30000);
-		
+	console.log('All ' + number + ' servers are spawned... Wait for the Test End msg to show up!!');
 }
 
 /**
@@ -90,11 +93,12 @@ function initHook(id, port, debug) {
  * Spawn a haibu-carapace child which starts a http testserver on port 8000
  * @param id {String} Id to be used for logging
  * @param port {Integer} The port to use for the hook.io server
- * @param error {Function} Function to call when a child dies.
+ * @param ready {Function} Function to call when a child exited.
+ * @param error {Function} Function to call when a child died.
  * @param debug {Boolean} True if debug msg need to be put on console...
  * @return {Process.child} 
  */
-function spawnServer(id, port, error, debug) {
+function spawnServer(id, port, ready, error, debug) {
 	var child,
 		script = path.join(__dirname, 'server.js');
 		command = path.join(__dirname, 'node_modules', '.bin', 'carapace');
@@ -119,8 +123,9 @@ function spawnServer(id, port, error, debug) {
 	}); 
 
 	child.on('exit', function (code) {
-		console.log('child process: ' + id + ' exited with code ' + code);
-		error(id);
+		if (debug) console.log('child process: ' + id + ' exited with code ' + code);
+		if (code !==0) error(id);
+		ready();
 	});
 
 	return child;
