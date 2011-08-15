@@ -12,7 +12,7 @@ var path = require('path'),
 	argv = require('optimist').argv;
 
 var debug = (argv.debug) ? true : false,
-	procs = (argv.procs) ? argv.procs : 10,
+	procs = (argv.procs) ? argv.procs : 1,
 	basePort = (argv.base) ? argv.base : 6000;
 
 //Start the test with the given arguments
